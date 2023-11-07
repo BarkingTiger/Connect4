@@ -8,8 +8,6 @@ void insert(char board[6][7], int top[7], char player, int col) {
   if (top[col - 1] < 0) {
     return;
   }
-  printf("%c\n", board[top[col - 1]][col - 1]);
-  printf("%c\n", player);
   // set spot to player color
   board[top[col - 1]][col - 1] = player;
   // substract from top layer
@@ -47,6 +45,8 @@ void side_selection(char board[6][7], int top[7], char *side, char *opponent) {
 
 // may change this to be better but for now fuck it
 bool check_winner(char board[6][7]) {
+
+	//horizontal
   for (int i = 0; i < 6; i += 1) {
     for (int j = 0; j < 7; j += 1) {
       if (board[i][j] != '-') {
@@ -59,6 +59,7 @@ bool check_winner(char board[6][7]) {
     }
   }
 
+  //vertical
   for (int j = 0; j < 7; j += 1) {
     for (int i = 0; i < 3; i += 1) {
       if (board[i][j] != '-') {
@@ -71,6 +72,7 @@ bool check_winner(char board[6][7]) {
     }
   }
 
+  //diagonal
   for (int i = 0; i < 3; i += 1) {
     for (int j = 0; j < 4; j += 1) {
       if (board[i][j] != '-') {
@@ -83,6 +85,7 @@ bool check_winner(char board[6][7]) {
     }
   }
 
+  //reverse diagonal
   for (int i = 3; i < 6; i += 1) {
     for (int j = 0; j < 4; j += 1) {
       if (board[i][j] != '-') {
@@ -96,6 +99,24 @@ bool check_winner(char board[6][7]) {
   }
 
   return false;
+}
+
+int negamax(char board[6][7], int top[7], char side, int alpha, int beta) {
+	//if number of moves is equal to max amount of moves return 0
+	
+	for(int i = 0; i < 7; i += 1) {
+		if(top[i] >= 0 && check_winner(board)) {
+			return (49 - moves) / 2;
+	return 1;
+}
+
+int pick_optimal(char board[6][7], int top[7], char side) {
+
+	for (int i = 0; i < 7; i += 1) {
+		//for each board run minimax
+	}
+	//then sort and pick best move
+	return 1;
 }
 
 void print_board(char board[6][7]) {
@@ -118,6 +139,7 @@ int main() {
   char opponent;
   char choice;
   char turn = 'r';
+  int moves = 0;
   //bool run = true;
 
   // initalize board
@@ -156,6 +178,7 @@ int main() {
       break;
     }
 
+    //kinda only relevant if against AI
     if (side == 'y') {
 	    turn = 'y';
     }
