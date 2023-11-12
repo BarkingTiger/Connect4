@@ -71,7 +71,7 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
 
         for (int x = 0; x < WIDTH; x += 1) {
                 if (canPlay(mask, x) && isWinningMove(current_position, mask, x)) {
-                        printf("END 2\n");
+                        //printf("END 2\n");
                         return (WIDTH * HEIGHT + 1 - moves) / 2;
                 }
         }
@@ -81,7 +81,7 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
         if (beta > max) {
                 beta = max;
                 if (alpha >= beta) {
-                        printf("END 3\n");
+                        //printf("END 3\n");
                         return beta;
                 }
         }
@@ -97,13 +97,16 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
                         int score = -negamax(copy_position, copy_mask, moves + 1, -beta, -alpha);
 
                         if (score >= beta) {
-                                printf("END 4\n");
+                                //printf("END 4\n");
                                 return score;
                         }
                         if (score > alpha) {
                                 alpha = score;
                         }
                 }
+		else {
+			printf("%d COLUMN FULL\n", x);
+		}
         }
         return alpha;
 }

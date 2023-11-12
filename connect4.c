@@ -1,3 +1,4 @@
+#include "ai.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,7 +49,7 @@ bool check_winner(char board[6][7]) {
 
 	//horizontal
   for (int i = 0; i < 6; i += 1) {
-    for (int j = 0; j < 7; j += 1) {
+    for (int j = 0; j < 4; j += 1) {
       if (board[i][j] != '-') {
         if (board[i][j] == board[i][j + 1] &&
             board[i][j + 1] == board[i][j + 2] &&
@@ -101,24 +102,6 @@ bool check_winner(char board[6][7]) {
   return false;
 }
 
-int negamax(char board[6][7], int top[7], char side, int alpha, int beta) {
-	//if number of moves is equal to max amount of moves return 0
-	
-	for(int i = 0; i < 7; i += 1) {
-		if(top[i] >= 0 && check_winner(board)) {
-			return (49 - moves) / 2;
-	return 1;
-}
-
-int pick_optimal(char board[6][7], int top[7], char side) {
-
-	for (int i = 0; i < 7; i += 1) {
-		//for each board run minimax
-	}
-	//then sort and pick best move
-	return 1;
-}
-
 void print_board(char board[6][7]) {
 	for (int i = 0; i < 6; i += 1) {
 		for (int j = 0; j < 7; j += 1) {
@@ -139,7 +122,7 @@ int main() {
   char opponent;
   char choice;
   char turn = 'r';
-  int moves = 0;
+  //int moves = 0;
   //bool run = true;
 
   // initalize board
@@ -200,11 +183,14 @@ int main() {
 		    continue;
 	    }
 	    //if column is full
-	    if (top[pick] < 0) {
+	    if (top[pick - 1] < 0) {
 		    printf("COLUMN FULL\n");
 		    continue;
 	    }
 	    insert(board, top, turn, pick);
+	    if (pick == 7) {
+	    	playOptimalMove(board, opponent);
+	    }
 	    print_board(board);
 	    if (turn == 'r') {
 		    turn = 'y';
