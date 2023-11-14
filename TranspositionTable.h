@@ -17,4 +17,12 @@ typedef struct Table Table;
 
 Table *tt_create(int capacity);
 
-void tt_delete(Table **t); 
+void tt_delete(Table **t);
+
+unsigned int tableIndex(Table *table, uint64_t key);
+
+void reset(Table *table);
+
+void put(Table *table, uint64_t key, uint8_t val);
+
+uint8_t get(Table *table, uint64_t key);
