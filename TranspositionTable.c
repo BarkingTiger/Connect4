@@ -3,12 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-Table *tt_create(int capacity) {
+Table *tt_create(int size) {
 	Table *table = (Table *)malloc(sizeof(Table));
 	if (table) {
-		table->Entries = (Entry *)malloc(sizeof(Entry) * capacity); //8388593
-		table->size = 0;
-		table->capacity = capacity;
+		table->Entries = (Entry *)malloc(sizeof(Entry) * size); //8388593
+		table->size = size;
 		return table;
 	}
 	return NULL;
@@ -24,15 +23,11 @@ unsigned int tableIndex(Table *table, uint64_t key) {
 }
 
 void reset(Table *table) {
-	memset(table->Entries, 0, table->capacity * sizeof(Entry));
-	table->size = 0;
+	memset(table->Entries, 0, table->size * sizeof(Entry));
 }
 
 void put(Table *table, uint64_t key, uint8_t val) {
 	unsigned int i = tableIndex(table, key);
-	if (table->Entries[i].key == 0) {
-		table->size += 1;
-	}
 	table->Entries[i].key = key;
 	table->Entries[i].val = val;
 }

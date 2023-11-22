@@ -1,4 +1,5 @@
 #include "ai.h"
+#include "TranspositionTable.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,6 +115,8 @@ void print_board(char board[6][7]) {
 // prints usage
 void usage() { printf("BLAH BLAH BLAH INSERT GUIDE HERE\n"); }
 
+Table *table;
+
 int main() {
   char board[6][7];
   int top[7] = {5, 5, 5, 5, 5, 5, 5};
@@ -122,6 +125,7 @@ int main() {
   char opponent;
   char choice;
   char turn = 'r';
+  table = tt_create(10);
   //int moves = 0;
   //bool run = true;
 
@@ -227,6 +231,7 @@ int main() {
     }
     */
   }
+  tt_delete(&table);
 
   return 0;
 }

@@ -10,12 +10,11 @@ typedef struct Entry Entry;
 struct Table{
         Entry *Entries;
         int size;
-        int capacity;
 };
 
 typedef struct Table Table;
 
-Table *tt_create(int capacity);
+Table *tt_create(int size);
 
 void tt_delete(Table **t);
 

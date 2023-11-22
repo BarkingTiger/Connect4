@@ -3,7 +3,7 @@ CFLAGS = -Wall -Werror -Wextra -Wpedantic
 
 all: connect4
 
-connect4: connect4.o ai.o
+connect4: connect4.o ai.o TranspositionTable.o
 	$(CC) -o $@ $^
 
 %.o: %.c %.h
