@@ -193,9 +193,11 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
                                 alpha = score;
                         }
                 }
+		/*
 		else {
 			printf("%d COLUMN FULL\n", x);
 		}
+  		*/
         }
 
 	put(table, current_position + mask, alpha - MIN_SCORE + 1);
@@ -257,13 +259,16 @@ int playOptimalMove(char board[6][7], char side) {
         printf("POSITION %" PRIu64 "\n", position);
         printf("MASK %" PRIu64 "\n", mask);
 
+	/*
 	for (int i = 0; i < 7; i += 1) {
 		if (canPlay(mask , i)) {
 			solve(position, mask, moves, i);
 		}
 	}
+	*/
 
-        return negamax(position, mask, moves, -21, 21);
+	return solve(position, mask, moves, 3);
+        //return negamax(position, mask, moves, -21, 21);
 }
 
                                                                                                          
