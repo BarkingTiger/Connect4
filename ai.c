@@ -136,6 +136,10 @@ uint64_t possibleNonLosingMoves(uint64_t current_position, uint64_t mask) {
 	return possible_mask & ~(opponent_win >> 1);
 }
 
+bool canWinNext(uint64_t current_position, uint64_t mask) {
+	return compute_winning_position(current_position, mask) & possible(mask);
+}
+
 unsigned int popcount(uint64_t m) {
         unsigned int c = 0;
         for (c = 0; m; c += 1) {
@@ -205,6 +209,9 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
 }
 
 int solve(uint64_t position, uint64_t mask, int moves, int col) {
+	if (canWinNext(position, mask)) {
+		return (WIDTH * HEIGHT + 1 - moves) / 2;
+	}
 	uint64_t copy_position = position;
 	uint64_t copy_mask = mask;
 	play(&copy_position, &copy_mask, col);
