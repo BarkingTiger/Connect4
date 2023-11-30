@@ -136,6 +136,18 @@ uint64_t possibleNonLosingMoves(uint64_t current_position, uint64_t mask) {
 	return possible_mask & ~(opponent_win >> 1);
 }
 
+unsigned int popcount(uint64_t m) {
+        unsigned int c = 0;
+        for (c = 0; m; c += 1) {
+                m &= m - 1;
+        }
+        return c;
+}
+
+int moveScore(uint64_t move, uint64_t current_position, uint64_t mask) {
+        return popcount(compute_winning_position(current_position | move, mask));
+}
+
 int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int beta) {
         if (moves == WIDTH * HEIGHT) {
                 printf("END 1\n");
