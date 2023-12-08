@@ -12,15 +12,19 @@
 extern Table *table;
 
 uint64_t bottom(int width, int height) {
-	return width == 0 ? 0 : bottom(width - 1, height) | 1LL << (width - 1) * (height + 1);
+        return width == 0 ? 0 : bottom(width - 1, height) | 1LL << (width - 1) * (height + 1);
 }
 
 static uint64_t bottom_mask() {
-	return bottom(WIDTH, HEIGHT);
+        return bottom(WIDTH, HEIGHT);
 }
 
 static uint64_t board_mask() {
-	return bottom_mask() * ((1LL << HEIGHT) - 1);
+        return bottom_mask() * ((1LL << HEIGHT) - 1);
+}
+
+static uint64_t column_mask(int col) {
+        return (((uint64_t)(1) << HEIGHT) - 1) << col * (HEIGHT + 1);
 }
 
 static uint64_t top_mask_col(int col) {
@@ -31,9 +35,11 @@ static uint64_t bottom_mask_col(int col) {
         return (uint64_t)(1) << col * (HEIGHT + 1);
 }
 
+/*
 static uint64_t column_mask_col(int col) {
         return (((uint64_t)(1) << HEIGHT) - 1) << col * (HEIGHT + 1);
 }
+*/
 
 bool canPlay(uint64_t mask, int col) {
         return (mask & top_mask_col(col)) == 0;
@@ -46,6 +52,7 @@ void play(uint64_t *current_position, uint64_t *mask, int col) {
         //moves += 1;
 }
 
+/*
 static bool alignment(uint64_t pos) {
         //horizontal
         uint64_t m = pos & (pos >> (HEIGHT + 1));
@@ -73,71 +80,78 @@ static bool alignment(uint64_t pos) {
 
         return false;
 }
+*/
 
+/*
 bool isWinningMove(uint64_t current_position, uint64_t mask, int col) {
         uint64_t pos = current_position;
         pos |= (mask & bottom_mask_col(col)) & column_mask_col(col);
         return alignment(pos);
 }
+*/
 
 uint64_t compute_winning_position(uint64_t position, uint64_t mask) {
 
-	//vertical
-	uint64_t r = (position << 1) & (position << 2) & (position << 3);
+        //vertical
+        uint64_t r = (position << 1) & (position << 2) & (position << 3);
 
-	//horizontal
-	uint64_t p = (position << (HEIGHT + 1)) & (position << 2 * (HEIGHT + 1));
-	r |= p & (position << 3 * (HEIGHT + 1));
-	r |= p & (position >> (HEIGHT + 1));
-	p >>= 3 * (HEIGHT + 1);
-	r |= p & (position << HEIGHT);
-	r |= p & (position >> 3 * (HEIGHT + 1));
+        //horizontal
+        uint64_t p = (position << (HEIGHT + 1)) & (position << 2 * (HEIGHT + 1));
+        r |= p & (position << 3 * (HEIGHT + 1));
+        r |= p & (position >> (HEIGHT + 1));
+        p >>= 3 * (HEIGHT + 1);
+        r |= p & (position << HEIGHT);
+        r |= p & (position >> 3 * (HEIGHT + 1));
 
-	//diagonal 1
-  	p = (position << HEIGHT) & (position << 2*HEIGHT);
-  	r |= p & (position << 3 * HEIGHT);
-  	r |= p & (position >> HEIGHT);
-  	p >>= 3 * HEIGHT;
-  	r |= p & (position << HEIGHT);
-  	r |= p & (position >> 3 * HEIGHT);
+        //diagonal 1
+        p = (position << HEIGHT) & (position << 2*HEIGHT);
+        r |= p & (position << 3 * HEIGHT);
+        r |= p & (position >> HEIGHT);
+        p >>= 3 * HEIGHT;
+        r |= p & (position << HEIGHT);
+        r |= p & (position >> 3 * HEIGHT);
 
-  	//diagonal 2
-  	p = (position << (HEIGHT + 2)) & (position << 2 * (HEIGHT + 2));
-  	r |= p & (position << 3*(HEIGHT + 2));
-  	r |= p & (position >> (HEIGHT + 2));
-  	p >>= 3 * (HEIGHT + 2);
-  	r |= p & (position << (HEIGHT + 2));
-  	r |= p & (position >> 3*(HEIGHT + 2));
+        //diagonal 2
+        p = (position << (HEIGHT + 2)) & (position << 2 * (HEIGHT + 2));
+        r |= p & (position << 3*(HEIGHT + 2));
+        r |= p & (position >> (HEIGHT + 2));
+        p >>= 3 * (HEIGHT + 2);
+        r |= p & (position << (HEIGHT + 2));
+        r |= p & (position >> 3*(HEIGHT + 2));
 
-  	return r & (board_mask() ^ mask);
+        return r & (board_mask() ^ mask);
 }
 
 uint64_t possible(uint64_t mask) {
-	return (mask + bottom_mask()) & board_mask();
+        return (mask + bottom_mask()) & board_mask();
 }
 
 uint64_t opponent_winning_position(uint64_t current_position, uint64_t mask) {
-	return compute_winning_position(current_position ^ mask, mask);
+        return compute_winning_position(current_position ^ mask, mask);
 }
 
 uint64_t possibleNonLosingMoves(uint64_t current_position, uint64_t mask) {
-	uint64_t possible_mask = possible(mask);
-	uint64_t opponent_win = opponent_winning_position(current_position, mask);
-	uint64_t forced_moves = possible_mask & opponent_win;
-	if (forced_moves) {
-		if (forced_moves & (forced_moves - 1)) {
-			return 0;
-		}
-		else {
-			possible_mask = forced_moves;
-		}
-	}
+        uint64_t possible_mask = possible(mask);
+        uint64_t opponent_win = opponent_winning_position(current_position, mask);
+        uint64_t forced_moves = possible_mask & opponent_win;
+        if (forced_moves) {
+                if (forced_moves & (forced_moves - 1)) {
+                        return 0;
+                }
+                else {
+                        possible_mask = forced_moves;
+                }
+        }
 
-	return possible_mask & ~(opponent_win >> 1);
+        return possible_mask & ~(opponent_win >> 1);
 }
 
 bool canWinNext(uint64_t current_position, uint64_t mask) {
-	return compute_winning_position(current_position, mask) & possible(mask);
+        return compute_winning_position(current_position, mask) & possible(mask);
+}
+
+bool isWinningMove(uint64_t current_position, uint64_t mask, int col) {
+        return compute_winning_position(current_position, mask) & possible(mask) & column_mask(col);
 }
 
 unsigned int popcount(uint64_t m) {
@@ -160,21 +174,22 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
 
         for (int x = 0; x < WIDTH; x += 1) {
                 if (canPlay(mask, x) && isWinningMove(current_position, mask, x)) {
-                        //printf("END 2\n");
+                        printf("END 2 %d\n", x);
                         return (WIDTH * HEIGHT + 1 - moves) / 2;
                 }
         }
 
         int max = (WIDTH * HEIGHT - 1 - moves) / 2;
-	int val = get(table, tableIndex(table, current_position + mask));
-	if (val) {
-		max = val + MIN_SCORE - 1;
-	}
+        int val = get(table, tableIndex(table, current_position + mask));
+        if (val) {
+                printf("VAL %d\n", val);
+                max = val + MIN_SCORE - 1;
+        }
 
         if (beta > max) {
                 beta = max;
                 if (alpha >= beta) {
-                        //printf("END 3\n");
+                        printf("END 3\n");
                         return beta;
                 }
         }
@@ -197,46 +212,47 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
                                 alpha = score;
                         }
                 }
-		/*
-		else {
-			printf("%d COLUMN FULL\n", x);
-		}
-  		*/
+                /*
+                else {
+                        printf("%d COLUMN FULL\n", x);
+                }
+                */
         }
 
-	put(table, current_position + mask, alpha - MIN_SCORE + 1);
+        put(table, current_position + mask, alpha - MIN_SCORE + 1);
+        printf("AFTER PUT\n");
         return alpha;
 }
 
 int solve(uint64_t position, uint64_t mask, int moves, int col) {
-	if (canWinNext(position, mask)) {
-		return (WIDTH * HEIGHT + 1 - moves) / 2;
-	}
-	uint64_t copy_position = position;
-	uint64_t copy_mask = mask;
-	play(&copy_position, &copy_mask, col);
-	int min = -(WIDTH * HEIGHT - moves) / 2;
-	int max = (WIDTH * HEIGHT + 1 - moves) / 2;
+        if (canWinNext(position, mask)) {
+                return (WIDTH * HEIGHT + 1 - moves) / 2;
+        }
+        uint64_t copy_position = position;
+        uint64_t copy_mask = mask;
+        play(&copy_position, &copy_mask, col);
+        int min = -(WIDTH * HEIGHT - moves) / 2;
+        int max = (WIDTH * HEIGHT + 1 - moves) / 2;
 
-	while (min < max) {
-		int med = min + (max - min) / 2;
-		if (med <= 0 && min / 2 < med) {
-			med = min / 2;
-		}
-		else if (med >= 0 && max / 2 > med) {
-			med = max / 2;
-		}
-		int r = negamax(copy_position, copy_mask, moves, med, med + 1);
+        while (min < max) {
+                int med = min + (max - min) / 2;
+                if (med <= 0 && min / 2 < med) {
+                        med = min / 2;
+                }
+                else if (med >= 0 && max / 2 > med) {
+                        med = max / 2;
+                }
+                int r = negamax(copy_position, copy_mask, moves, med, med + 1);
 
-		if (r <= med) {
-			max = r;
-		}
-		else {
-			min = r;
-		}
-	}
+                if (r <= med) {
+                        max = r;
+                }
+                else {
+                        min = r;
+                }
+        }
 
-	return min;
+        return min;
 }
 
 int playOptimalMove(char board[6][7], char side) {
@@ -266,16 +282,18 @@ int playOptimalMove(char board[6][7], char side) {
         printf("POSITION %" PRIu64 "\n", position);
         printf("MASK %" PRIu64 "\n", mask);
 
-	/*
-	for (int i = 0; i < 7; i += 1) {
-		if (canPlay(mask , i)) {
-			solve(position, mask, moves, i);
-		}
-	}
-	*/
+        /*
+        for (int i = 0; i < 7; i += 1) {
+                if (canPlay(mask , i)) {
+                        solve(position, mask, moves, i);
+                }
+        }
+        */
 
-	return solve(position, mask, moves, 3);
+        return solve(position, mask, moves, 3);
         //return negamax(position, mask, moves, -21, 21);
 }
 
-                                                                                                         
+
+
+                                                                                                                    
