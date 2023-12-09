@@ -125,7 +125,7 @@ int main() {
   char opponent;
   char choice;
   char turn = 'r';
-  table = tt_create(10);
+  table = tt_create(8388593);
   //int moves = 0;
   //bool run = true;
 

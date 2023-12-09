@@ -1,5 +1,6 @@
 #include "TranspositionTable.h"
 #include <inttypes.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,3 +42,11 @@ uint8_t get(Table *table, uint64_t key) {
 		return 0;
 	}
 }
+
+void printAll(Table *table) {
+	for (int i = 0; i < table->size; i += 1) {
+		printf("I %d\n", i);
+		printf("KEY %" PRIu64 "\n", table->Entries[i].key);
+		printf("VAL %d\n", table->Entries[i].val);
+	}
+}	

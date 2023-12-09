@@ -168,13 +168,13 @@ int moveScore(uint64_t move, uint64_t current_position, uint64_t mask) {
 
 int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int beta) {
         if (moves == WIDTH * HEIGHT) {
-                printf("END 1\n");
+                //printf("END 1\n");
                 return 0;
         }
 
         for (int x = 0; x < WIDTH; x += 1) {
                 if (canPlay(mask, x) && isWinningMove(current_position, mask, x)) {
-                        printf("END 2 %d\n", x);
+                        //printf("END 2 %d\n", x);
                         return (WIDTH * HEIGHT + 1 - moves) / 2;
                 }
         }
@@ -189,7 +189,7 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
         if (beta > max) {
                 beta = max;
                 if (alpha >= beta) {
-                        printf("END 3\n");
+                        //printf("END 3\n");
                         return beta;
                 }
         }
@@ -220,7 +220,7 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
         }
 
         put(table, current_position + mask, alpha - MIN_SCORE + 1);
-        printf("AFTER PUT\n");
+        //printf("AFTER PUT\n");
         return alpha;
 }
 
@@ -289,8 +289,11 @@ int playOptimalMove(char board[6][7], char side) {
                 }
         }
         */
+	int test = solve(position, mask, moves, 3);
+	//printAll(table);
+	return test;
 
-        return solve(position, mask, moves, 3);
+        //return solve(position, mask, moves, 3);
         //return negamax(position, mask, moves, -21, 21);
 }
 
