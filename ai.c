@@ -9,7 +9,29 @@
 #define MIN_SCORE -(WIDTH * HEIGHT) / 2 + 3
 #define MAX_SCORE (WIDTH * HEIGHT + 1) / 2 - 3
 
+struct entries
+
 extern Table *table;
+
+void add (uint64_t move, int score) {
+	int pos = 0; //should be size
+	//for (; pos && entries[pos - 1].score > score; --pos) entries[pos] = entries[pos - 1]
+	//entries[pos].move = move;
+	//entries[pos].score = score;
+}
+
+uint64_t getNext() {
+	if () {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+void reset() {
+	int size = 0;
+}
 
 uint64_t bottom(int width, int height) {
         return width == 0 ? 0 : bottom(width - 1, height) | 1LL << (width - 1) * (height + 1);
