@@ -9,7 +9,12 @@
 #define MIN_SCORE -(WIDTH * HEIGHT) / 2 + 3
 #define MAX_SCORE (WIDTH * HEIGHT + 1) / 2 - 3
 
-struct entries
+struct Entries {
+	uint64_t move;
+	int score;
+};
+
+typedef struct Entries Entries;
 
 extern Table *table;
 
