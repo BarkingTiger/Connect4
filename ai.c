@@ -9,33 +9,42 @@
 #define MIN_SCORE -(WIDTH * HEIGHT) / 2 + 3
 #define MAX_SCORE (WIDTH * HEIGHT + 1) / 2 - 3
 
-struct Entries {
+int columnOrder[WIDTH] = {3, 4, 2, 5, 1, 6, 0};
+
+struct Move {
 	uint64_t move;
 	int score;
 };
 
-typedef struct Entries Entries;
+typedef struct Move Move;
+
+struct Moves {
+	int size;
+	Move moves[WIDTH];
+};
+
+typedef struct Moves Moves;
 
 extern Table *table;
 
-void add (uint64_t move, int score) {
-	int pos = 0; //should be size
-	//for (; pos && entries[pos - 1].score > score; --pos) entries[pos] = entries[pos - 1]
-	//entries[pos].move = move;
-	//entries[pos].score = score;
+void add (Moves *moves, uint64_t move, int score) {
+	int pos = moves->size++;
+	for(; pos && moves->moves[pos - 1].score > score; --pos) moves->moves[pos] = moves->moves[pos - 1];
+	moves->moves[pos].move = move;
+	moves->moves[pos].score = score;
 }
 
-uint64_t getNext() {
-	if () {
-		return 1;
+uint64_t getNext(Moves *moves) {
+	if (moves->size) {
+		return moves->moves[--moves->size].move;
 	}
 	else {
 		return 0;
 	}
 }
 
-void reset() {
-	int size = 0;
+void resetMoves(Moves *moves) {
+	moves->size = 0;
 }
 
 uint64_t bottom(int width, int height) {
@@ -221,6 +230,15 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
                 }
         }
 
+	Moves moves;
+
+	for (int i = WIDTH; i--; ) {
+		if (uint64_t m = next & column_mask(columnOrder[i])) {
+			add(moves, m, moveScore(m));
+		}
+	}
+
+	/*
         for (int x = 0; x < WIDTH; x += 1) {
                 if (canPlay(mask, x)) {
                         //need to make position and mask pointers so they retain the play
@@ -239,11 +257,7 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
                                 alpha = score;
                         }
                 }
-                /*
-                else {
-                        printf("%d COLUMN FULL\n", x);
-                }
-                */
+	*/
         }
 
         put(table, current_position + mask, alpha - MIN_SCORE + 1);
