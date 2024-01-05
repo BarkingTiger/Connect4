@@ -1,4 +1,4 @@
-CC = clang
+CC = clang -g
 CFLAGS = -Wall -Werror -Wextra -Wpedantic
 
 all: connect4

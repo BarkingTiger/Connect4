@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define HEIGHT 6
 #define WIDTH 7
@@ -27,11 +28,11 @@ typedef struct Moves Moves;
 
 extern Table *table;
 
-void add (Moves *moves, uint64_t move, int score) {
-	int pos = moves->size++;
-	for(; pos && moves->moves[pos - 1].score > score; --pos) moves->moves[pos] = moves->moves[pos - 1];
-	moves->moves[pos].move = move;
-	moves->moves[pos].score = score;
+void add (Moves moves, uint64_t move, int score) {
+	int pos = moves.size++;
+	//for(; pos && moves.moves[pos - 1].score > score; --pos) //moves.moves[pos] = moves.moves[pos - 1];
+	moves.moves[pos].move = move;
+	moves.moves[pos].score = score;
 }
 
 uint64_t getNext(Moves *moves) {
@@ -247,11 +248,13 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
         }
 
 	Moves movesArray;
+	memcpy(movesArray.moves, movesArray.moves, sizeof(movesArray.moves));
 
 	for (int i = WIDTH; i--; ) {
+		printf("%d\n", i);
 		uint64_t m = next & column_mask(columnOrder[i]);
 		if (m) {
-			add(&movesArray, m, moveScore(m, current_position, mask));
+			add(movesArray, m, moveScore(m, current_position, mask));
 		}
 	}
 
