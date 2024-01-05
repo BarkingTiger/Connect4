@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -21,18 +22,33 @@ typedef struct Move Move;
 
 struct Moves {
 	int size;
-	Move moves[WIDTH];
+	Move *moves;
 };
 
 typedef struct Moves Moves;
 
+Moves *create_moves(int size) {
+	Moves *moves = (Moves *)malloc(sizeof(Moves));
+	if (moves) {
+		moves->moves = (Move *)malloc(sizeof(Move) * size); //width
+		moves->size = 0;
+		return moves;
+	}
+	return NULL;
+}
+
+void delete_moves(Moves **m) {
+	free((*m)->moves);
+	free(*m);
+}
+
 extern Table *table;
 
-void add (Moves moves, uint64_t move, int score) {
-	int pos = moves.size++;
-	//for(; pos && moves.moves[pos - 1].score > score; --pos) //moves.moves[pos] = moves.moves[pos - 1];
-	moves.moves[pos].move = move;
-	moves.moves[pos].score = score;
+void add (Moves *moves, uint64_t move, int score) {
+	int pos = moves->size++;
+	for(; pos && moves->moves[pos - 1].score > score; --pos) moves->moves[pos] = moves->moves[pos - 1];
+	moves->moves[pos].move = move;
+	moves->moves[pos].score = score;
 }
 
 uint64_t getNext(Moves *moves) {
@@ -46,6 +62,12 @@ uint64_t getNext(Moves *moves) {
 
 void resetMoves(Moves *moves) {
 	moves->size = 0;
+}
+
+void printMoves(Moves *moves) {
+	for int(i = 0; i < WIDTH; i += 1) {
+		printf("%d\n", i);
+	}
 }
 
 uint64_t bottom(int width, int height) {
@@ -247,18 +269,16 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
                 }
         }
 
-	Moves movesArray;
-	memcpy(movesArray.moves, movesArray.moves, sizeof(movesArray.moves));
+	Moves *movesArray = create_moves(WIDTH);
 
 	for (int i = WIDTH; i--; ) {
-		printf("%d\n", i);
 		uint64_t m = next & column_mask(columnOrder[i]);
 		if (m) {
 			add(movesArray, m, moveScore(m, current_position, mask));
 		}
 	}
 
-	uint64_t nextCol = getNext(&movesArray);
+	uint64_t nextCol = getNext(movesArray);
 
 	while(nextCol) {
 
@@ -269,13 +289,14 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
 		int score = -negamax(copy_position, copy_mask, moves + 1, -beta, -alpha);
 
 		if (score >= beta) {
+			delete_moves(&movesArray);
 			return score;
 		}
 		if (score > alpha) {
 			alpha = score;
 		}
 
-		nextCol = getNext(&movesArray);
+		nextCol = getNext(movesArray);
 		if (nextCol == 0) {
 			break;
 		}
@@ -304,6 +325,7 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
 	*/
 
         put(table, current_position + mask, alpha - MIN_SCORE + 1);
+	delete_moves(&movesArray);
         //printf("AFTER PUT\n");
         return alpha;
 }
@@ -366,14 +388,20 @@ int playOptimalMove(char board[6][7], char side) {
         printf("POSITION %" PRIu64 "\n", position);
         printf("MASK %" PRIu64 "\n", mask);
 
-        /*
-        for (int i = 0; i < 7; i += 1) {
+	/*
+        int test = -99;
+        for (int i = 6; i >= 3; i -= 1) {
                 if (canPlay(mask , i)) {
-                        solve(position, mask, moves, i);
+                        int score = solve(position, mask, moves, i);
+			if (score > test) {
+			       test = score;
+			}
+			reset(table);
+			printf("DONE %d\n", i);	
                 }
         }
-        */
-	int test = solve(position, mask, moves, 3);
+	*/
+	int test = solve(position, mask, moves, 5);
 	//printAll(table);
 	return test;
 
