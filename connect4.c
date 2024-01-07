@@ -125,7 +125,7 @@ int main() {
   char opponent;
   char choice;
   char turn = 'r';
-  table = tt_create(8388593);
+  table = tt_create(256);
   //int moves = 0;
   //bool run = true;
 
@@ -192,9 +192,9 @@ int main() {
 		    continue;
 	    }
 	    insert(board, top, turn, pick);
-	    if (pick == 7) {
-	    	playOptimalMove(board, opponent);
-	    }
+	    //if (pick == 7) {
+	    	playOptimalMove(board, turn);
+	    //}
 	    print_board(board);
 	    if (turn == 'r') {
 		    turn = 'y';

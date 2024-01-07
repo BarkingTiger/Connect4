@@ -64,11 +64,13 @@ void resetMoves(Moves *moves) {
 	moves->size = 0;
 }
 
+/*
 void printMoves(Moves *moves) {
 	for int(i = 0; i < WIDTH; i += 1) {
 		printf("%d\n", i);
 	}
 }
+*/
 
 uint64_t bottom(int width, int height) {
         return width == 0 ? 0 : bottom(width - 1, height) | 1LL << (width - 1) * (height + 1);
@@ -104,8 +106,12 @@ bool canPlay(uint64_t mask, int col) {
         return (mask & top_mask_col(col)) == 0;
 }
 
+void play(uint64_t *current_position, uint64_t *mask, uint64_t move) {
+	*current_position ^= *mask;
+	*mask |= move;
+}
 
-void play(uint64_t *current_position, uint64_t *mask, int col) {
+void playCol(uint64_t *current_position, uint64_t *mask, int col) {
         *current_position ^= *mask;
         *mask |= *mask + bottom_mask_col(col);
         //moves += 1;
@@ -226,14 +232,20 @@ int moveScore(uint64_t move, uint64_t current_position, uint64_t mask) {
 }
 
 int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int beta) {
-
+	/*
+	if (alpha < beta) {
+		printf("Something went wrong.\n");
+	}
+	*/
+	//printf("ALPHA %d\n BETA %d\n", alpha, beta);
 	uint64_t next = possibleNonLosingMoves(current_position, mask);
 	if (next == 0) {
+		//printf("next == 0\n");
 		return -(WIDTH * HEIGHT - moves) / 2;
 	}
 
         if (moves >= WIDTH * HEIGHT - 2) {
-                //printf("END 1\n");
+               	//printf("END 1\n");
                 return 0;
         }
 
@@ -250,6 +262,7 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
         if (alpha < min) {
                 alpha = min;
                 if (alpha >= beta) {
+			//printf("alpha >= beta\n");
                         return alpha;
                 }
         }
@@ -257,7 +270,7 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
         int max = (WIDTH * HEIGHT - 1 - moves) / 2;
         int val = get(table, tableIndex(table, current_position + mask));
         if (val) {
-                printf("VAL %d\n", val);
+                //printf("VAL %d\n", val);
                 max = val + MIN_SCORE - 1;
         }
 
@@ -265,18 +278,54 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
                 beta = max;
                 if (alpha >= beta) {
                         //printf("END 3\n");
+			//printf("alpha >= beta 2\n");
                         return beta;
                 }
         }
 
 	Moves *movesArray = create_moves(WIDTH);
 
+	/*
+	for (int i = 0; i < WIDTH; i += 1) {
+                printf("MOVE %" PRIu64 " ", movesArray->moves[i].move);
+                printf("SCORE %d ", movesArray->moves[i].score);
+		printf("\n");
+        }
+        //printf("\n");
+	*/
+	
+	
+
+	/*	
+	if (moves == 1) {
+		printf("ALPHA %d\n", alpha);
+		return 1;
+	}
+	*/
+	
+	
+
 	for (int i = WIDTH; i--; ) {
 		uint64_t m = next & column_mask(columnOrder[i]);
+		//printf("COLUMN %d ", columnOrder[i]);
+		//printf("NEXT %" PRIu64 " ", next);
+		//printf("MASK %" PRIu64 " ", column_mask(columnOrder[i]));
 		if (m) {
 			add(movesArray, m, moveScore(m, current_position, mask));
 		}
+		//printf("\n");
 	}
+	//printf("\n");
+	
+	/*	
+	for (int i = 0; i < WIDTH; i += 1) {
+                printf("MOVE %" PRIu64 " ", movesArray->moves[i].move);
+                printf("SCORE %d ", movesArray->moves[i].score);
+                printf("\n");
+        }
+        printf("\n");
+	*/
+
 
 	uint64_t nextCol = getNext(movesArray);
 
@@ -285,9 +334,9 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
 		uint64_t copy_position = current_position;
 		uint64_t copy_mask = mask;
 
-		play(&copy_position, &copy_mask, next);
+		play(&copy_position, &copy_mask, nextCol);
 		int score = -negamax(copy_position, copy_mask, moves + 1, -beta, -alpha);
-
+		//printf("TEST\n");
 		if (score >= beta) {
 			delete_moves(&movesArray);
 			return score;
@@ -330,18 +379,22 @@ int negamax(uint64_t current_position, uint64_t mask, int moves, int alpha, int 
         return alpha;
 }
 
+/*
 int solve(uint64_t position, uint64_t mask, int moves, int col) {
         if (canWinNext(position, mask)) {
                 return (WIDTH * HEIGHT + 1 - moves) / 2;
         }
         uint64_t copy_position = position;
         uint64_t copy_mask = mask;
-        play(&copy_position, &copy_mask, col);
-        int min = -(WIDTH * HEIGHT - moves) / 2;
-        int max = (WIDTH * HEIGHT + 1 - moves) / 2;
-
+        playCol(&copy_position, &copy_mask, col);
+        //int min = -(WIDTH * HEIGHT - moves) / 2;
+        //int max = (WIDTH * HEIGHT + 1 - moves) / 2;
+	int min = -1;
+	int max = 1;
+	//printf("MIN %d\n MAX %d\n", min, max);
         while (min < max) {
                 int med = min + (max - min) / 2;
+		//printf("med %d\n", med);
                 if (med <= 0 && min / 2 < med) {
                         med = min / 2;
                 }
@@ -349,6 +402,7 @@ int solve(uint64_t position, uint64_t mask, int moves, int col) {
                         med = max / 2;
                 }
                 int r = negamax(copy_position, copy_mask, moves, med, med + 1);
+		//printf("R %d\n", r);
 
                 if (r <= med) {
                         max = r;
@@ -356,9 +410,45 @@ int solve(uint64_t position, uint64_t mask, int moves, int col) {
                 else {
                         min = r;
                 }
+		//printf("%d %d\n", min, max);
         }
 
+	//int r = negamax(copy_position, copy_mask, moves, max, min);
+	//min = r;
+	printf("DONE\n");
         return min;
+}*/
+
+int solve(uint64_t position, uint64_t mask, int moves, int col) {
+	if (canWinNext(position, mask)) {
+		return (WIDTH * HEIGHT + 1 - moves) / 2;
+	}
+	uint64_t copy_position = position;
+	uint64_t copy_mask = mask;
+	playCol(&copy_position, &copy_mask, col);
+	
+	int min = -(WIDTH * HEIGHT - moves) / 2;
+	int max = (WIDTH * HEIGHT + 1 - moves) / 2;
+
+	while (min < max) {
+		int med = min + (max - min) / 2;
+		if (med <= 0 && min / 2 > med) {
+			med = min / 2;
+		}
+		else if (med >= 0 && max / 2 > med) {
+			med = max / 2;
+		}
+		
+		int r = negamax(copy_position, copy_mask, moves, med, med - 1);
+		if (r <= med) {
+			max = r;
+		}
+		else {
+			min = r;
+		}
+	}
+
+	return min;
 }
 
 int playOptimalMove(char board[6][7], char side) {
@@ -385,23 +475,30 @@ int playOptimalMove(char board[6][7], char side) {
                 }
                 counter += 1;
         }
+	position ^= mask;
         printf("POSITION %" PRIu64 "\n", position);
         printf("MASK %" PRIu64 "\n", mask);
 
-	/*
+
+
+	/*	
         int test = -99;
-        for (int i = 6; i >= 3; i -= 1) {
+	
+        for (int i = 6; i >= 0; i -= 1) {
                 if (canPlay(mask , i)) {
                         int score = solve(position, mask, moves, i);
 			if (score > test) {
 			       test = score;
 			}
 			reset(table);
+			printf("SCORE %d\n", score);
 			printf("DONE %d\n", i);	
                 }
         }
 	*/
-	int test = solve(position, mask, moves, 5);
+	
+	
+	int test = solve(position, mask, moves, 1);
 	//printAll(table);
 	return test;
 
