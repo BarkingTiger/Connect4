@@ -1,12 +1,12 @@
-CC = clang -g
+CC = g++
 CFLAGS = -Wall -Werror -Wextra -Wpedantic
 
 all: connect4
 
-connect4: connect4.o ai.o TranspositionTable.o
+connect4: solver.o
 	$(CC) -o $@ $^
 
-%.o: %.c %.h
+%.o: %.cpp %.hpp
 	$(CC) $(CFLAGS) -c $<
 
 clean:
