@@ -1,16 +1,18 @@
-CC = g++
-CFLAGS = -Wall -Werror -Wextra -Wpedantic
+CXX=g++
+CXXFLAGS=--std=c++11 -W -Wall -O3 -DNDEBUG
 
-all: connect4
+SRCS=connect4.cpp
+OBJS=$(subst .cpp,.o,$(SRCS))
 
-connect4: solver.o
-	$(CC) -o $@ $^
+connect4:$(OBJS)
+	$(CXX) $(LDFLAGS) -o $@ $^
 
 %.o: %.cpp %.hpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) $<
 
 clean:
-	rm -f connect4 *.o
+	rm -f *.o connect4
 
-format:
-	clang-format -i -style=file *.[ch]
+
+
+

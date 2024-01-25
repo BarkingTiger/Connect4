@@ -24,11 +24,9 @@ class Position {
 			current_position ^= mask;
 			mask |= move;
 			moves += 1;
-			//std::cout << "POS " << current_position << std::endl;
 		}
 
 	  	void colPlay(int col) {
-			//std::cout << "COL " << col << std::endl;
 			playCol(col);	
 		}
 
@@ -69,6 +67,34 @@ class Position {
 			std::cout << this->mask << std::endl;
 		}
 
+		void setCurrent(uint64_t position) {
+			current_position = position;
+		}
+
+		void setMask(uint64_t mask) {
+			this->mask = mask;
+		}
+
+		void setMoves(unsigned int moves) {
+			this->moves = moves;
+		}
+
+		uint64_t getCurrent() {
+			return this->current_position;
+		}
+
+		uint64_t getMask() {
+			return this->mask;
+		}
+
+		bool canPlay(int col) const {
+			return (mask & top_mask_col(col)) == 0;
+		}
+
+		bool isWinningMove(int col) const {
+			return winning_position() & possible() & column_mask(col);
+		}
+
 		Position() : current_position{0}, mask{0}, moves{0} {}
 
 	private:
@@ -76,18 +102,8 @@ class Position {
                 uint64_t mask;
                 unsigned int moves;
 
-                bool canPlay(int col) const {
-                        return (mask & top_mask_col(col)) == 0;
-                }
-
                 void playCol(int col) {
-			std::cout << bottom_mask_col(col) << std::endl;
-			std::cout << column_mask(col) << std::endl;
                         play((mask + bottom_mask_col(col)) & column_mask(col));
-                }
-
-                bool isWinningMove(int col) const {
-                        return winning_position() & possible() & column_mask(col);
                 }
 
                 uint64_t winning_position() const {
