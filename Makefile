@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=--std=c++11 -W -Wall -O3 -DNDEBUG
+CXXFLAGS=--std=c++11 -W -Wall -O3 -DNDEBUG -Wno-unused-result
 
 SRCS=connect4.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))

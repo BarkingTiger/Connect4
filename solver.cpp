@@ -135,9 +135,7 @@ int playOptimalMove(char board[6][7], char side, std::unordered_map<uint64_t, in
                 }
                 counter += 1;
         }
-	if (side == 'r') {
-		position ^= mask;
-	}
+
 	Position P[7];
 	int column = 0;
 
