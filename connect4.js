@@ -35,7 +35,7 @@ function clickYellow() {
     playerChoice = playerYellow;
     gameOver = false;
     disableChoice();
-    test();
+    //test();
 }
 
 /*
@@ -126,7 +126,7 @@ function setPiece() {
     currColumns[c] = r; //update the array
 
     checkWinner();    
-    test();
+    //test();
     console.log(moves);
 }
 
