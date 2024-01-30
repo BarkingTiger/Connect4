@@ -68,7 +68,7 @@ function setGame() {
             tile.id = r.toString() + "-" + c.toString();
             tile.classList.add("tile");
             tile.addEventListener("click", setPiece);
-            tile.addEventListener("click", test);
+            //tile.addEventListener("click", test);
             document.getElementById("board").append(tile);
         }
         board.push(row);
